@@ -1,0 +1,384 @@
+#include <iostream>
+class Node {
+public:
+    int data;
+    Node* next{};
+    Node(int data_, Node* next_ = nullptr) : data(data_), next(next_)  {
+        //std::cout << "Node constructed." << std::endl;
+    }
+};
+
+class LinkList {
+private:
+    Node* head{};
+    Node* tail{};
+    int length{};
+
+public:
+    LinkList(int value) {
+        head = new Node(value);
+        tail = head;
+        length = 1;
+    }
+    ~LinkList() {
+        Node* temp = head;
+        while (head) {
+            head = head->next;
+            delete temp;
+            temp = head;
+        }
+    }
+        Node* getHead() const {
+            if (head) {
+                return head;
+            }
+            return nullptr;
+        }
+        Node* getTail() const {
+            if (tail) {
+                return tail;
+            }
+            return nullptr;
+        }
+
+        int getLength() const {
+            return length;
+        }
+
+        void printList() {
+            Node* temp = head;
+            while (head) {
+                std::cout << head->data << " ";
+                head = head->next;
+            };
+            head = temp;
+            std::cout << std::endl;
+        }
+
+        void append(int value) {
+            Node* newNode = new Node(value);
+            if (length == 0) {
+                head = newNode;
+                tail = newNode;
+            }
+            else {
+                tail->next = newNode;
+                tail = newNode;
+            }
+            ++length;
+        }
+
+        void deleteNode() {
+            if (length == 0) {
+                return;
+            }
+            Node* tmp = head;
+            if (length == 1) {
+                head = nullptr;
+                tail = nullptr;
+            }
+            else {
+                Node* pre = head;
+                while (tmp->next) {
+                    pre = tmp;
+                    tmp = tmp->next;
+                }
+                tail = pre;
+                tail->next = nullptr;
+            }
+            delete tmp;
+            --length;
+        }
+
+        void prepend(int value) {
+            try{
+            Node* newNode = new Node(value);
+            if (length ==0) {
+                head = newNode;
+                tail = newNode;
+            }
+            else if (newNode) {
+                newNode->next = head;
+                head = newNode;
+            }
+            ++length;
+            }
+            catch (std::exception ex) {
+                std::cout << ex.what();
+            }
+
+        }
+
+        void deleteFirst() {
+            if (length == 0) return;
+            Node* temp = head;
+            if (length == 1) {
+                head = nullptr;
+                tail = nullptr;
+            }
+            else {
+                head = head->next;
+            }
+            delete temp;
+            --length;
+        }
+        void deleteLast() {
+            if (length == 0) { return; }
+            Node* temp = head;
+            if (length == 1) {
+                head = nullptr;
+                tail = nullptr;
+            }
+            else {
+                Node* pre = head;
+                while (temp->next) {
+                    pre = temp;
+                    temp = temp->next;
+                }
+                tail = pre;
+                tail->next = nullptr;
+            }
+            delete temp;
+            --length;
+        }
+
+        Node* get(int index) {
+            if ((index<0) || length <= index) return nullptr;
+
+            Node* tmp = head;
+            for (int i = 0; i < index; ++i) {
+                tmp = tmp->next;
+            }
+            return tmp;
+        }
+        
+        bool set(int index, int value) {
+            Node* tmp = get(index);
+            if (tmp) {
+                tmp->data = value;
+                return true;
+            }
+            return false;
+        }
+
+        bool insert(int index, int value) {
+            if ((index < 0) || length < index) { return false; }
+            if (index == 0) {
+                prepend(value);
+                return true;
+            }
+            else if (index == length) {
+                append(value);
+                return true;
+            }
+            else {
+                Node* tmp = get(index - 1);
+                Node* newNode = new Node(value);
+                if (tmp && newNode) {
+                    newNode->next = tmp->next;
+                    tmp->next = newNode;
+                    ++length;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        void deleteNode(int index) {
+            if (index < 0 || length <= index) { return; }
+            if (index == 0) {
+                return deleteFirst();
+            }
+            if (index == length - 1) {
+                return deleteLast();
+            }
+            else {
+                Node* prev = get(index - 1);
+                Node* temp = prev->next;
+                prev->next = temp->next;
+                delete temp;
+                --length;
+            }
+        }
+        void reverse() {
+            if (length <2 ) { return; }
+            Node* tmp = head;
+            head = tail;
+            tail = tmp;
+            Node* nxt = tmp->next;
+            Node* pre = nullptr;
+            for (int i= 0; i < length; ++i) {
+                nxt = tmp->next;
+                tmp->next = pre;
+                pre = tmp;
+                tmp = nxt;
+            }
+        }
+};
+
+int main()
+{
+    LinkList* ll = new LinkList(4);
+   
+    ll->append(5);
+    ll->append(6);
+    ll->append(7);
+    std::cout << "ll->length : "<< ll->getLength()<<std::endl;
+    ll->printList();
+    std::cout << "---------------------" << std::endl;
+    ll->deleteNode();
+    std::cout << "ll->length : " << ll->getLength() << std::endl;
+    std::cout << "ll->head : "<< ll->getHead()<<std::endl;
+    std::cout << "ll->tail : "<< ll->getTail()<<std::endl;
+    ll->printList();
+    std::cout << "---------------------" << std::endl;
+    ll->deleteNode();
+    std::cout << "ll->length : " << ll->getLength() << std::endl;
+    std::cout << "ll->head : " << ll->getHead() << std::endl;
+    std::cout << "ll->tail : " << ll->getTail() << std::endl;
+    ll->printList();
+    std::cout << "---------------------" << std::endl;
+    ll->deleteNode();
+    std::cout << "ll->length : " << ll->getLength() << std::endl;
+    std::cout << "ll->head : " << ll->getHead() << std::endl;
+    std::cout << "ll->tail : " << ll->getTail() << std::endl;
+    ll->printList();
+
+    std::cout << "---------------------" << std::endl;
+    ll->deleteNode();
+    std::cout << "ll->length : " << ll->getLength() << std::endl;
+    std::cout << "ll->head : " << ll->getHead() << std::endl;
+    std::cout << "ll->tail : " << ll->getTail() << std::endl;
+    ll->printList();
+
+    std::cout << "---------------------" << std::endl;
+    ll->deleteNode();
+    std::cout << "ll->length : " << ll->getLength() << std::endl;
+    std::cout << "ll->head : " << ll->getHead() << std::endl;
+    std::cout << "ll->tail : " << ll->getTail() << std::endl;
+    ll->printList();
+    std::cout << "---------ll->append(5)------------" << std::endl;
+    ll->append(5);
+    std::cout << "ll->length : " << ll->getLength() << std::endl;
+    std::cout << "ll->head : " << ll->getHead() << std::endl;
+    std::cout << "ll->tail : " << ll->getTail() << std::endl;
+    ll->printList();
+
+    std::cout << "---------ll->prepend(8)------------" << std::endl;
+    ll->prepend(8);
+    std::cout << "ll->length : " << ll->getLength() << std::endl;
+    std::cout << "ll->head : " << ll->getHead() << std::endl;
+    std::cout << "ll->tail : " << ll->getTail() << std::endl;
+    ll->printList();
+
+    std::cout << "---------ll->deleteFirst------------" << std::endl;
+    ll->deleteFirst();
+    std::cout << "ll->length : " << ll->getLength() << std::endl;
+    std::cout << "ll->head : " << ll->getHead() << std::endl;
+    std::cout << "ll->tail : " << ll->getTail() << std::endl;
+    ll->printList();
+    std::cout << "---------ll->deleteFirst------------" << std::endl;
+    ll->deleteFirst();
+    std::cout << "ll->length : " << ll->getLength() << std::endl;
+    std::cout << "ll->head : " << ll->getHead() << std::endl;
+    std::cout << "ll->tail : " << ll->getTail() << std::endl;
+    ll->printList();
+    std::cout << "---------ll->deleteFirst------------" << std::endl;
+    ll->deleteFirst();
+    std::cout << "ll->length : " << ll->getLength() << std::endl;
+    std::cout << "ll->head : " << ll->getHead() << std::endl;
+    std::cout << "ll->tail : " << ll->getTail() << std::endl;
+    ll->printList();
+
+    std::cout << "---------ll->append(9)------------" << std::endl;
+    ll->append(9);
+    std::cout << "---------ll->append(10)------------" << std::endl;
+    ll->append(10);
+    std::cout << "ll->length : " << ll->getLength() << std::endl;
+    std::cout << "ll->head : " << ll->getHead() << std::endl;
+    std::cout << "ll->tail : " << ll->getTail() << std::endl;
+    ll->printList();
+    std::cout << "ll->get(3) : " << ll->get(3)<< std::endl;
+    std::cout << "ll->get(2) : " << ll->get(2)<< std::endl;
+    std::cout << "ll->get(1) : " << ll->get(1)<< std::endl;
+    std::cout << "ll->get(0) : " << ll->get(0)<< std::endl;
+    ll->printList();
+    std::cout << "---------ll->set(1, 15)------------" << std::endl;
+    ll->set(1, 15);
+    std::cout << "ll->length : " << ll->getLength() << std::endl;
+    std::cout << "ll->head : " << ll->getHead() << std::endl;
+    std::cout << "ll->tail : " << ll->getTail() << std::endl;
+    ll->printList();
+    std::cout << "---------ll->insert(1, 16)------------" << std::endl;
+    ll->insert(1, 16);
+    std::cout << "ll->length : " << ll->getLength() << std::endl;
+    std::cout << "ll->head : " << ll->getHead() << std::endl;
+    std::cout << "ll->tail : " << ll->getTail() << std::endl;
+    ll->printList();
+    std::cout << "---------ll->insert(1, 17)------------" << std::endl;
+    ll->insert(1, 17);
+    std::cout << "ll->length : " << ll->getLength() << std::endl;
+    std::cout << "ll->head : " << ll->getHead() << std::endl;
+    std::cout << "ll->tail : " << ll->getTail() << std::endl;
+    ll->printList();
+    std::cout << "---------ll->insert(0, 18)------------" << std::endl;
+    ll->insert(0, 18);
+    std::cout << "ll->length : " << ll->getLength() << std::endl;
+    std::cout << "ll->head : " << ll->getHead() << std::endl;
+    std::cout << "ll->tail : " << ll->getTail() << std::endl;
+    ll->printList();
+    std::cout << "---------ll->insert(5, 18)------------" << std::endl;
+    ll->insert(5, 19);
+    std::cout << "ll->length : " << ll->getLength() << std::endl;
+    std::cout << "ll->head : " << ll->getHead() << std::endl;
+    std::cout << "ll->tail : " << ll->getTail() << std::endl;
+    ll->printList();
+    std::cout << "---------ll->deleteNode(0)------------" << std::endl;
+    ll->deleteNode(0);
+    std::cout << "ll->length : " << ll->getLength() << std::endl;
+    std::cout << "ll->head : " << ll->getHead() << std::endl;
+    std::cout << "ll->tail : " << ll->getTail() << std::endl;
+    ll->printList();
+    std::cout << "---------ll->deleteNode(5)------------" << std::endl;
+    ll->deleteNode(5);
+    std::cout << "ll->length : " << ll->getLength() << std::endl;
+    std::cout << "ll->head : " << ll->getHead() << std::endl;
+    std::cout << "ll->tail : " << ll->getTail() << std::endl;
+    ll->printList();
+    std::cout << "---------ll->deleteNode(4)------------" << std::endl;
+    ll->deleteNode(4);
+    std::cout << "ll->length : " << ll->getLength() << std::endl;
+    std::cout << "ll->head : " << ll->getHead() << std::endl;
+    std::cout << "ll->tail : " << ll->getTail() << std::endl;
+    ll->printList();
+    std::cout << "---------ll->deleteLast()------------" << std::endl;
+    ll->deleteLast();
+    std::cout << "ll->length : " << ll->getLength() << std::endl;
+    std::cout << "ll->head : " << ll->getHead() << std::endl;
+    std::cout << "ll->tail : " << ll->getTail() << std::endl;
+    ll->printList();
+    std::cout << "---------ll->deleteNode(1)------------" << std::endl;
+    ll->deleteNode(1);
+    std::cout << "ll->length : " << ll->getLength() << std::endl;
+    std::cout << "ll->head : " << ll->getHead() << std::endl;
+    std::cout << "ll->tail : " << ll->getTail() << std::endl;
+    ll->printList();
+
+    std::cout << "---------ll->reverse()------------" << std::endl;
+    ll->reverse();
+    std::cout << "ll->length : " << ll->getLength() << std::endl;
+    std::cout << "ll->head : " << ll->getHead() << std::endl;
+    std::cout << "ll->tail : " << ll->getTail() << std::endl;
+    ll->printList();
+    ll->append(20);
+    ll->append(21);
+    ll->append(23);
+    ll->append(26);
+    ll->printList();
+    std::cout << "---------ll->reverse()------------" << std::endl;
+    ll->reverse();
+    std::cout << "ll->length : " << ll->getLength() << std::endl;
+    std::cout << "ll->head : " << ll->getHead() << std::endl;
+    std::cout << "ll->tail : " << ll->getTail() << std::endl;
+    ll->printList();
+}
