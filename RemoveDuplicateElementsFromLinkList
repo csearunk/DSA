@@ -1,0 +1,154 @@
+#include <iostream>
+#include <unordered_set>
+
+using namespace std;
+
+class Node {
+    public:
+        int value;
+        Node* next;
+        Node(int value) {
+            this->value = value;
+            next = nullptr;
+        }
+};
+
+class LinkedList {
+    private:
+        Node* head;
+        int length;
+        
+    public:
+        LinkedList(int value) {
+            Node* newNode = new Node(value);
+            head = newNode;
+            length = 1;
+        }
+
+        ~LinkedList() {
+            Node* temp = head;
+            while (head) {
+                head = head->next;
+                delete temp;
+                temp = head;
+            }
+        }
+
+        void printList() {
+            Node* temp = head;
+            if (temp == nullptr) {
+                cout << "empty";
+            } else {
+                while (temp != nullptr) {
+                    cout << temp->value;
+                    temp = temp->next;
+                    if (temp != nullptr) {
+                        cout << " -> ";
+                    }
+                }
+            }
+            cout << endl;
+        }
+
+        Node* getHead() {
+            return head;
+        }
+
+        int getLength() {
+            return length;
+        }
+        
+        void makeEmpty() {
+            Node* temp = head;
+            while (head) {
+                head = head->next;
+                delete temp;
+                temp = head;
+            }
+            length = 0;
+        }
+
+        void append(int value) {
+            Node* newNode = new Node(value);
+            if (head == nullptr) {
+                head = newNode;
+            } else {
+                Node* currentNode = head;
+                while (currentNode->next != nullptr) {
+                    currentNode = currentNode->next;
+                }
+                currentNode->next = newNode;
+            }
+            length++;
+        }
+        
+        void removeDuplicates() {
+            if(!head || !head->next) return;
+            // unordered_set<int> values{};
+            // Node* prev = nullptr;
+            // Node* curr = head;
+            // while(curr) {
+            //     if(values.find(curr->value) != values.end()) {
+            //         prev->next = curr->next;
+            //         delete curr;
+            //         curr = prev->next;
+            //         --length;
+            //     } else {
+            //         values.insert(curr->value);
+            //         prev = curr;
+            //         curr = curr->next;
+                    
+            //     }
+            // }
+            //--------------------------------------------------------------------
+            // unordered_set<int> oset;
+            // Node* prev = head;
+            // Node* temp = head;
+            // auto itr = oset.begin();
+            // for(int i = 0; ((i< length) && temp->next) && (itr != oset.end()); ++i, ++itr) {
+            //     if(temp->value == *itr) {
+            //         prev->next = temp->next;
+            //         // temp = temp->next;
+            //         --length;
+            //     } else {
+            //         oset.insert(itr, temp->value);
+            //         prev  = temp;
+            //     }
+            //     temp = temp->next;
+            // }
+            //--------------------------------
+            // Node* temp = head;
+            // Node* orig = head;
+            
+            // for(int i = 0; (i < length) && (!orig->next); ++i) {
+            //     for(int  j = 0; (j < length) && (!temp->next); ++j) {
+            //         if((i != j) && (temp->value == orig->value)) {
+            //             //temp ->value = 0;
+            //             orig = orig->next;
+            //             --length;
+            //         }
+            //         else {
+            //             orig->next = temp;
+            //         }
+            //         temp = temp->next;
+            //     }
+            // }
+            Node* curr = head;
+            while(curr != nullptr) {
+                Node* run = curr;
+                while(run->next) {
+                    if(run->next->value == curr->value) {
+                        Node* temp = run->next;
+                        run->next = run->next->next;
+                        delete temp;
+                        --length;
+                    } else {
+                        run = run->next;
+                    }
+                }
+                curr = curr->next;
+            }
+        }
+};
+
+
