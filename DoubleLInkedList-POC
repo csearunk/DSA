@@ -1,0 +1,256 @@
+#include<iostream>
+#include<memory>
+
+struct Node {
+  Node* next{};
+  Node* prev{};
+  int value{};
+  Node(int val) : value(val), next(nullptr), prev(nullptr) {
+      std::cout<<"Node created with value  : "<<value<<std::endl;
+  } 
+};
+
+class DoublyLinkList {
+    private:
+    int length{};
+    Node* head;
+    Node* tail;
+    public:
+    DoublyLinkList(int value) : length(0), head(nullptr) {
+        Node* newNode = new Node(value);
+        tail = newNode;
+        head = newNode;
+        length = 1;
+    }
+    ~DoublyLinkList() {
+        Node* temp = head;
+        while(head) {
+            head = head->next;
+            delete temp;
+            temp = head;
+            // --length;
+        }
+        // std::cout<<"length : "<<length;
+        // length = 0;
+    }
+    
+    void append(int data) {
+        if(!head) return;
+        
+        Node* last = new Node(data);
+        if(length == 0) {
+            head = last;
+            tail = last;
+        }
+        else {
+            tail->next = last;
+            last->prev = tail;
+            tail = last;
+        }
+        ++length;
+        // std::cout<<"length++ : "<<length<<std::endl;
+    }
+    
+    void deleteLast() {
+        if((length == 0) || !head) return;
+        
+        Node* temp = tail;
+        if(length == 1) {
+            head = nullptr;
+            tail = nullptr;
+        } else {
+            tail = tail->prev;
+            tail->next = nullptr;
+        }
+          delete temp;
+        --length;
+    }
+    
+    void prepend(int data) {
+        if(!head) return;
+        Node* newNode = new Node(data);
+        if(length == 0) {
+            head = newNode;
+            tail = newNode;
+        } else {
+            head->prev = newNode;
+            newNode->next = head;
+            head = newNode;
+        }
+        ++length;
+    }
+    
+    void deleteFirst() {
+        if(length == 0) return;
+        
+        Node* temp = head;
+        if(length == 1) {
+            head = nullptr;
+            tail = nullptr;
+        } else {
+            head = head->next;
+            head->prev = nullptr;
+        }
+        delete temp;
+        --length;
+    }
+    
+    Node* get(int index) {
+        if((index < 0) || index >= length) return nullptr;
+        if(length == 0) return nullptr;
+        Node* temp = head;
+        if(index < length/2 ) {
+            for(int i = 0; i < index; ++i) {
+                // if(i == index) {
+                //     return temp;
+                // }
+                temp = temp->next;
+            }
+        } else {
+            temp = tail;
+            for(int i = (length-1); i>index; --i) {
+                temp = temp->prev;
+            }
+        }
+        return temp;
+    }
+    
+    bool set(int index, int value) {
+        Node* temp = get(index);
+        if(temp) {
+            temp->value = value;
+            return true;
+        }
+        return false;
+    }
+    
+    bool insert(int index, int value) {
+        if(index == 0) {
+            prepend(value);
+            return true;
+        }
+        
+        if(index == length) {
+            append(value);
+            return true;
+        }
+        else {
+            Node* temp = get(index-1);
+            // std::cout<<temp<<std::endl;
+            if(temp) {
+                Node* newNode = new Node(value);
+                newNode->prev = temp;
+                newNode->next = temp->next;
+                temp->next->prev = newNode;
+                temp->next = newNode;
+                temp = newNode;
+                ++length;
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    bool deleteNode(int index) {
+        if(index == 0) {
+            deleteFirst();
+            return true;
+        }
+        
+        if(index == length) {
+            deleteLast();
+            return true;
+        } else {
+            Node* temp = get(index);
+            std::cout<<temp->value<<std::endl;
+            if(temp) {
+                // Node* before = nullptr;
+                // Node* after = nullptr;
+                // if(temp->prev)
+                //     before = temp->prev;
+                // after = temp->next; 
+                // before->next = temp->next;
+                // after->prev = temp->prev;
+                // delete temp;
+                temp->prev->next = temp->next;
+                temp->next->prev = temp->prev;
+                delete temp;
+                --length;
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    int getLength() const {
+        return length;
+    }
+    
+    int getHead() const {
+        return head ? head->value : 0;
+    }
+    
+    int getTail() const {
+        return tail ? tail->value : 0;
+    }
+    
+    void printList() const {
+        Node* temp = head;
+        while(temp) {
+            std::cout<<temp->value<<" ";
+            temp = temp->next;
+        }
+        std::cout<<std::endl;
+    }
+};
+
+int main() {
+    std::unique_ptr<DoublyLinkList> myDLL(new DoublyLinkList(12)); 
+    myDLL->append(14);
+    myDLL->append(0);
+    myDLL->append(100);
+    myDLL->printList();
+    std::cout<<"--------------------------------"<<std::endl;
+    myDLL->deleteLast(); 
+    myDLL->deleteLast();
+    myDLL->printList();
+    std::cout<<"--------------------------------"<<std::endl;
+    myDLL->prepend(8);
+    myDLL->prepend(9);
+    myDLL->prepend(10);
+    myDLL->prepend(11);
+    myDLL->printList();
+    std::cout<<"--------------------------------"<<std::endl;
+    myDLL->deleteFirst();
+    myDLL->deleteFirst();
+    myDLL->deleteFirst();
+    myDLL->printList();
+    std::cout<<"--------------------------------"<<std::endl;
+    // std::cout<<myDLL->get(0)<<std::endl;
+    std::cout<<myDLL->getHead()<<std::endl;
+    myDLL->printList();
+    std::cout<<"--------------------------------"<<std::endl;
+    std::cout<<std::boolalpha<<myDLL->set(0, 5)<<std::endl;
+    // std::cout<<myDLL->getHead()<<std::endl;
+    myDLL->printList();
+    std::cout<<"----------------insert(0, 6)----------------"<<std::endl;
+    std::cout<<std::boolalpha<<myDLL->insert(0, 6)<<std::endl;
+    std::cout<<std::boolalpha<<myDLL->insert(2, 0)<<std::endl;
+    std::cout<<std::boolalpha<<myDLL->insert(3, 21)<<std::endl;
+    myDLL->printList();
+    std::cout<<"------------------insert(4, 31)--------------"<<std::endl;
+    std::cout<<std::boolalpha<<myDLL->insert(4, 31)<<std::endl;
+    myDLL->printList();
+    std::cout<<"--------------------------------"<<std::endl;
+    std::cout<<std::boolalpha<<myDLL->insert(4, 32)<<std::endl;
+    myDLL->printList();
+    std::cout<<"--------------------------------"<<std::endl;
+    std::cout<<"------------deleteNode(1)--------------------"<<std::endl;
+    std::cout<<std::boolalpha<<myDLL->deleteNode(1)<<std::endl;
+    myDLL->printList();
+    std::cout<<"--------------------------------"<<std::endl;
+    // std::cout<<myDLL->getLength()<<std::endl;
+    // std::cout<<myDLL->getTail()<<std::endl;
+    // std::cout<<"--------------------------------"<<std::endl;
+    return 0;
+}
